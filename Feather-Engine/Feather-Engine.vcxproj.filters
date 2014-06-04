@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\FEngine">
+      <UniqueIdentifier>{8e93a9e7-b8b0-4dc9-a3e0-03104a021b2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FEngine">
+      <UniqueIdentifier>{5d1ae7a0-80a0-4001-afd5-dd1cfe7de044}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FEngine\GFX">
+      <UniqueIdentifier>{913eb827-b7e0-4fd8-94da-05e6c6f6f754}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FEngine\GFX">
+      <UniqueIdentifier>{c14904fe-9c93-4311-970d-8bfec5dc4105}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{1aff4a8d-10c0-4dfa-973d-b3a6c35251dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\Basic">
+      <UniqueIdentifier>{7075580f-426d-4bee-9ad4-e6e67d406063}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GFX.cpp">
+      <Filter>Source Files\FEngine\GFX</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderLoader.cpp">
+      <Filter>Shader Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GFX.h">
+      <Filter>Header Files\FEngine\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderLoader.h">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="BasicPixelShader.hlsl">
+      <Filter>Shader Files\Basic</Filter>
+    </FxCompile>
+    <FxCompile Include="BasicVertexShader.hlsl">
+      <Filter>Shader Files\Basic</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
