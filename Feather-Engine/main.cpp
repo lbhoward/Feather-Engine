@@ -18,6 +18,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	{
 		m_GFX.ClearScene(FColour(1.0f, 0.0f, 0.0f, 1.0f));
 		m_GFX.Draw();
+
 		//Check for quit
 		if(PeekMessage(&msg_Message,m_hwnd,0,0,PM_REMOVE))
          {
@@ -28,6 +29,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
          }
 	}
 
+	m_GFX.CleanD3D();
 	DestroyWindow(m_hwnd);
 
 	return 0;

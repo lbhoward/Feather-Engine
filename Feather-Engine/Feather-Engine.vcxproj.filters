@@ -62,4 +62,9 @@
       <Filter>Shader Files\Basic</Filter>
     </FxCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders.shader">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

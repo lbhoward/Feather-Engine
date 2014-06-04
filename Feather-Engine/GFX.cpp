@@ -1,5 +1,12 @@
 #include "GFX.h"
 
+FVertex Triangle_Verts[] =
+	{
+		{ 0.0f, 0.5f, 0.0f, FColour(1.0f, 0.0f, 0.0f, 1.0f)},
+        { 0.45f, -0.5f, 0.0f, FColour(0.0f, 1.0f, 0.0f, 1.0f)},
+        { -0.45f, -0.5f, 0.0f, FColour(0.0f, 0.0f, 1.0f, 1.0f)}
+    };
+
 // Constructor
 GFX::GFX(HWND hwnd)
 {
@@ -15,23 +22,6 @@ GFX::GFX(HWND hwnd)
 	g_vertexBuffer = nullptr;
 
 	InitialiseDevice(hwnd);
-
-	// Save Vertices for Basic Triangle
-	FVertex Triangle_Verts[] =
-    {
-        { 0.0f, 0.5f, 0.0f },
-        { 0.45f, -0.5f, 0.0f },
-        { -0.45f, -0.5f, 0.0f }
-    };
-
-	// Setup a Vertex Buffer for rendering the data
-	D3D11_BUFFER_DESC bd;
-	bd.ByteWidth = sizeof(FVertex) * ARRAYSIZE(Triangle_Verts);
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	D3D11_SUBRESOURCE_DATA srd = {Triangle_Verts, 0, 0};
-	// And finally create the Vertex Buffer from the above description
-	g_pd3dDevice->CreateBuffer(&bd, &srd, &g_vertexBuffer);
-
 	InitialisePipeline();
 }
 
@@ -60,7 +50,7 @@ void GFX::Draw()
 {
 	DrawTriangle();
 
-	g_pSwapChain->Present(1,0);
+	g_pSwapChain->Present(0,0);
 }
 
 // Draw a Triangle!
@@ -80,28 +70,47 @@ void GFX::DrawTriangle()
 // Set up the basic Rendering Pipeline (Shaders etc)
 void GFX::InitialisePipeline()
 {
-	// Load the Shader Files
-	CSORead VSFile = LoadShaderFile("BasicVertexShader.cso");
-	CSORead PSFile = LoadShaderFile("BasicPixelShader.cso");
+	ID3D10Blob *VS, *PS; // COM Buffers for Pixel and Vertex Shader
+	//D3DX11CompileFromFile(); // Deprecated
+	D3DCompileFromFile(L"shaders.shader", 0, 0, "VShader", "vs_4_0", 0, 0, &VS, 0);
+	D3DCompileFromFile(L"shaders.shader", 0, 0, "PShader", "ps_4_0", 0, 0, &PS, 0);
 
-	// And Create the Shader Objects
-	g_pd3dDevice->CreateVertexShader(VSFile.Data, VSFile.Length, nullptr, &g_vertexShader);
-	g_pd3dDevice->CreatePixelShader(PSFile.Data, PSFile.Length, nullptr, &g_pixelShader);
+	// Go ahead and create the Shader Objects from the blob objects
+	g_pd3dDevice->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &g_VS); // These are both stored in the classes pre-defined pointers
+	g_pd3dDevice->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &g_PS);
 
-	// Set these as our Active Shaders
-	g_pImmediateContext->VSSetShader(g_vertexShader, nullptr, 0);
-	g_pImmediateContext->PSSetShader(g_pixelShader, nullptr, 0);
+	// And now set these shaders to be our Active Shaders
+	g_pImmediateContext->VSSetShader(g_VS, 0, 0);
+	g_pImmediateContext->PSSetShader(g_PS, 0, 0);
 
-	// Define the input layout for our Shaders
-	D3D11_INPUT_ELEMENT_DESC ied[] =
+
+
+	// Setup a Vertex Buffer for rendering the data
+	D3D11_BUFFER_DESC bd;
+	ZeroMemory(&bd, sizeof(bd));
+
+	bd.Usage = D3D11_USAGE_DYNAMIC; // Allows write access by CPU and GPU
+	bd.ByteWidth = sizeof(FVertex) * ARRAYSIZE(Triangle_Verts);
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // Allow the CPU to write to this buffer
+
+	g_pd3dDevice->CreateBuffer(&bd, NULL, &g_vertexBuffer);// Finally create the Vertex Buffer
+
+	// Now we need to map the VBuffer, copy the VData to the VBuffer, and unmap the VBuffer
+	D3D11_MAPPED_SUBRESOURCE ms;
+	g_pImmediateContext->Map(g_vertexBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+	memcpy(ms.pData, Triangle_Verts, sizeof(Triangle_Verts));
+	g_pImmediateContext->Unmap(g_vertexBuffer, NULL);
+
+	// Now we make sure the GPU knows exactly how we defined the Layout of our Vertex information
+	D3D11_INPUT_ELEMENT_DESC ied[] = 
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0}//,
-		//{"COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
+	g_pd3dDevice->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &g_inputLayout);
+	g_pImmediateContext->IASetInputLayout(g_inputLayout); // Finally load this layout into the device context.
 
-	// Create and set the Input Layout
-	g_pd3dDevice->CreateInputLayout(ied, ARRAYSIZE(ied), VSFile.Data, VSFile.Length, &g_inputLayout);
-	g_pImmediateContext->IASetInputLayout(g_inputLayout);
 }
 
 // Set up the D3D11 Device
@@ -177,4 +186,18 @@ HRESULT GFX::InitialiseDevice(HWND hwnd)
     g_pImmediateContext->RSSetViewports( 1, &vp ); 
  
     return S_OK; 
+}
+
+// Release all used COM objects
+void GFX::CleanD3D()
+{
+	g_pSwapChain->SetFullscreenState(FALSE, NULL);
+
+	g_VS->Release();
+	g_PS->Release();
+
+	g_pSwapChain->Release();
+	//backbuffer->Release();
+	g_pd3dDevice->Release();
+	g_pImmediateContext->Release();
 }

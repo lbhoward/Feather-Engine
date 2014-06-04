@@ -2,6 +2,7 @@
 #include <d3dcommon.h>
 #include <d3d11.h>
 #include <d3d11_1.h>
+#include <d3dcompiler.h>
 
 #include "ShaderLoader.h"
 
@@ -21,6 +22,7 @@ struct FColour
 struct FVertex
 {
 	float X,Y,Z;
+	FColour Colour;	
 };
 
 class GFX
@@ -36,6 +38,9 @@ public:
 	void Draw();
 
 	void DrawTriangle();
+
+	// Release Functions
+	void CleanD3D();
 
 private:
 	HRESULT InitialiseDevice(HWND hwnd);
@@ -53,7 +58,7 @@ private:
 	ID3D11Buffer* g_vertexBuffer;
 
 	//DX11 Shaders
-	ID3D11VertexShader* g_vertexShader;
-	ID3D11PixelShader* g_pixelShader;
+	ID3D11VertexShader* g_VS;
+	ID3D11PixelShader* g_PS;
 	ID3D11InputLayout* g_inputLayout;
 };
