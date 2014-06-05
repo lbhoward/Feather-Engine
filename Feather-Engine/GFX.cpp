@@ -22,6 +22,7 @@ GFX::GFX(HWND hwnd)
 	g_vertexBuffer = nullptr;
 
 	InitialiseDevice(hwnd);
+	InitialiseShaders();
 	InitialisePipeline();
 }
 
@@ -48,58 +49,30 @@ void GFX::ClearScene(FColour RGBA)
 // Draw at V-Sync rate
 void GFX::Draw()
 {
-	DrawTriangle();
+	//DrawTriangle();
+	DrawTriangle(0.5, 0, 0, 1);
+	DrawTriangle(0, 0.5, 0, 1);
+	DrawTriangle(0, -0.5, 0, 1);
+	DrawTriangle(-0.5, 0, 0, 1);
 
 	g_pSwapChain->Present(0,0);
 }
 
-// Draw a Triangle!
-void GFX::DrawTriangle()
-{	
-	// Set the Vertex Buffer
-	UINT stride = sizeof(FVertex);
-	UINT offset = 0;
-	g_pImmediateContext->IASetVertexBuffers(0, 1, &g_vertexBuffer, &stride, &offset);
-	// And the Primitive Topology
-	g_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// And Finally - draw!
-	g_pImmediateContext->Draw(3, 0);
-}
-
-// Set up the basic Rendering Pipeline (Shaders etc)
-void GFX::InitialisePipeline()
+// Adds vertices to VBuffer and draws a triangle
+void GFX::DrawTriangle(float x, float y, float z, float scale)
 {
-	ID3D10Blob *VS, *PS; // COM Buffers for Pixel and Vertex Shader
-	//D3DX11CompileFromFile(); // Deprecated
-	D3DCompileFromFile(L"shaders.shader", 0, 0, "VShader", "vs_4_0", 0, 0, &VS, 0);
-	D3DCompileFromFile(L"shaders.shader", 0, 0, "PShader", "ps_4_0", 0, 0, &PS, 0);
-
-	// Go ahead and create the Shader Objects from the blob objects
-	g_pd3dDevice->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &g_VS); // These are both stored in the classes pre-defined pointers
-	g_pd3dDevice->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &g_PS);
-
-	// And now set these shaders to be our Active Shaders
-	g_pImmediateContext->VSSetShader(g_VS, 0, 0);
-	g_pImmediateContext->PSSetShader(g_PS, 0, 0);
-
-
-
-	// Setup a Vertex Buffer for rendering the data
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
-
-	bd.Usage = D3D11_USAGE_DYNAMIC; // Allows write access by CPU and GPU
-	bd.ByteWidth = sizeof(FVertex) * ARRAYSIZE(Triangle_Verts);
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // Allow the CPU to write to this buffer
-
-	g_pd3dDevice->CreateBuffer(&bd, NULL, &g_vertexBuffer);// Finally create the Vertex Buffer
+	// So first we should define the vertices based on input
+	FVertex newTriangle[] =
+	{
+		{x, y+0.1f, z, FColour(0.0f, 0.0f, 0.0f, 1.0f)}, // Top
+		{x+0.1f, y-0.1f, z, FColour(0.0f, 0.0f, 0.0f, 1.0f)},		// Right
+		{x-0.1f, y-0.1f, z, FColour(0.0f, 0.0f, 0.0f, 1.0f)}		// Left
+	};
 
 	// Now we need to map the VBuffer, copy the VData to the VBuffer, and unmap the VBuffer
 	D3D11_MAPPED_SUBRESOURCE ms;
 	g_pImmediateContext->Map(g_vertexBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
-	memcpy(ms.pData, Triangle_Verts, sizeof(Triangle_Verts));
+	memcpy(ms.pData, newTriangle, sizeof(newTriangle));
 	g_pImmediateContext->Unmap(g_vertexBuffer, NULL);
 
 	// Now we make sure the GPU knows exactly how we defined the Layout of our Vertex information
@@ -111,6 +84,75 @@ void GFX::InitialisePipeline()
 	g_pd3dDevice->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &g_inputLayout);
 	g_pImmediateContext->IASetInputLayout(g_inputLayout); // Finally load this layout into the device context.
 
+	// Set the Vertex Buffer
+	UINT stride = sizeof(FVertex);
+	UINT offset = 0;
+	g_pImmediateContext->IASetVertexBuffers(0, 1, &g_vertexBuffer, &stride, &offset);
+	// And the Primitive Topology
+	g_pImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// And Finally - draw!
+	g_pImmediateContext->Draw(3, 0);
+}
+
+// Draw a Triangle!
+void GFX::DrawTriangle()
+{	
+	// Set the Vertex Buffer
+	UINT stride = sizeof(FVertex);
+	UINT offset = 0;
+	g_pImmediateContext->IASetVertexBuffers(0, 1, &g_vertexBuffer, &stride, &offset);
+	// And the Primitive Topology
+	g_pImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// And Finally - draw!
+	g_pImmediateContext->Draw(3, 0);
+}
+
+//	Sets the basic VShader and PShader and assigns to ImmContext
+void GFX::InitialiseShaders()
+{
+	//D3DX11CompileFromFile(); // Deprecated
+	D3DCompileFromFile(L"shaders.shader", 0, 0, "VShader", "vs_4_0", 0, 0, &VS, 0);
+	D3DCompileFromFile(L"shaders.shader", 0, 0, "PShader", "ps_4_0", 0, 0, &PS, 0);
+
+	// Go ahead and create the Shader Objects from the blob objects
+	g_pd3dDevice->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &g_VS); // These are both stored in the classes pre-defined pointers
+	g_pd3dDevice->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &g_PS);
+
+	// And now set these shaders to be our Active Shaders
+	g_pImmediateContext->VSSetShader(g_VS, 0, 0);
+	g_pImmediateContext->PSSetShader(g_PS, 0, 0);
+}
+
+// Set up the basic Rendering Pipeline (Shaders etc)
+void GFX::InitialisePipeline()
+{
+	// Setup a Vertex Buffer for rendering the data
+	D3D11_BUFFER_DESC bd;
+	ZeroMemory(&bd, sizeof(bd));
+
+	bd.Usage = D3D11_USAGE_DYNAMIC; // Allows write access by CPU and GPU
+	bd.ByteWidth = sizeof(FVertex) * ARRAYSIZE(Triangle_Verts);
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // Allow the CPU to write to this buffer
+
+	g_pd3dDevice->CreateBuffer(&bd, NULL, &g_vertexBuffer);// Finally create the Vertex Buffer
+
+	//// Now we need to map the VBuffer, copy the VData to the VBuffer, and unmap the VBuffer
+	//D3D11_MAPPED_SUBRESOURCE ms;
+	//g_pImmediateContext->Map(g_vertexBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+	//memcpy(ms.pData, Triangle_Verts, sizeof(Triangle_Verts));
+	//g_pImmediateContext->Unmap(g_vertexBuffer, NULL);
+
+	//// Now we make sure the GPU knows exactly how we defined the Layout of our Vertex information
+	//D3D11_INPUT_ELEMENT_DESC ied[] = 
+	//{
+	//	{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	//	{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	//};
+	//g_pd3dDevice->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &g_inputLayout);
+	//g_pImmediateContext->IASetInputLayout(g_inputLayout); // Finally load this layout into the device context.
 }
 
 // Set up the D3D11 Device

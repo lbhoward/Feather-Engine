@@ -45,6 +45,10 @@ public:
 private:
 	HRESULT InitialiseDevice(HWND hwnd);
 	void InitialisePipeline();
+	void InitialiseShaders();
+
+	// Primitives
+	void DrawTriangle(float x, float y, float z, float scale);
 
 	//DirectX
 	D3D_DRIVER_TYPE         g_driverType; 
@@ -61,4 +65,7 @@ private:
 	ID3D11VertexShader* g_VS;
 	ID3D11PixelShader* g_PS;
 	ID3D11InputLayout* g_inputLayout;
+
+	// COM Buffers for Pixel and Vertex Shader
+	ID3D10Blob *VS, *PS;
 };
