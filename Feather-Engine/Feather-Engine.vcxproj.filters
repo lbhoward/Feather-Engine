@@ -42,6 +42,9 @@
     <ClCompile Include="ShaderLoader.cpp">
       <Filter>Shader Files</Filter>
     </ClCompile>
+    <ClCompile Include="FModel.cpp">
+      <Filter>Source Files\FEngine\GFX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -52,6 +55,12 @@
     </ClInclude>
     <ClInclude Include="ShaderLoader.h">
       <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FModel.h">
+      <Filter>Header Files\FEngine\GFX</Filter>
+    </ClInclude>
+    <ClInclude Include="FStructs.h">
+      <Filter>Header Files\FEngine\GFX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

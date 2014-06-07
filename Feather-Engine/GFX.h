@@ -4,26 +4,8 @@
 #include <d3d11_1.h>
 #include <d3dcompiler.h>
 
-#include "ShaderLoader.h"
-
-struct FColour
-{
-	FColour(float R, float G, float B, float A)
-	{
-		Colour[0] = R;
-		Colour[1] = G;
-		Colour[2] = B;
-		Colour[3] = A;
-	}
-
-	float Colour[4];
-};
-
-struct FVertex
-{
-	float X,Y,Z;
-	FColour Colour;	
-};
+#include "FStructs.h"
+#include "FModel.h"
 
 class GFX
 {
@@ -68,4 +50,7 @@ private:
 
 	// COM Buffers for Pixel and Vertex Shader
 	ID3D10Blob *VS, *PS;
+
+	//Model Test
+	FModel triangle_01;
 };
