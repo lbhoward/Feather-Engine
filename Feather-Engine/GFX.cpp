@@ -1,12 +1,5 @@
 #include "GFX.h"
 
-FVertex Triangle_Verts[] =
-	{
-		{ 0.0f, 0.5f, 0.0f, FColour(1.0f, 0.0f, 0.0f, 1.0f)},
-        { 0.45f, -0.5f, 0.0f, FColour(0.0f, 1.0f, 0.0f, 1.0f)},
-        { -0.45f, -0.5f, 0.0f, FColour(0.0f, 0.0f, 1.0f, 1.0f)}
-    };
-
 // Constructor
 GFX::GFX(HWND hwnd)
 {

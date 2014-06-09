@@ -79,12 +79,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FModel.cpp" />
+    <ClCompile Include="FObjLoader.cpp" />
     <ClCompile Include="GFX.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FModel.h" />
+    <ClInclude Include="FObjLoader.h" />
     <ClInclude Include="FStructs.h" />
     <ClInclude Include="GFX.h" />
     <ClInclude Include="main.h" />

@@ -5,6 +5,7 @@
 #include <d3dcompiler.h>
 
 #include "FStructs.h"
+#include "FObjLoader.h"
 
 class FModel
 {
@@ -19,9 +20,9 @@ private:
 	bool InitVertexBuffer(ID3D11Device* device);
 	bool InitShaders(ID3D11Device* device);
 
-	int numOfVertices;
+	int numOfVertices, numOfIndices;
 	
-	ID3D11Buffer* vertexBuffer; // Each model has it's own Vertex Buffer
+	ID3D11Buffer *vertexBuffer, *indexBuffer; // Each model has it's own Vertex & Index Buffer
 	ID3D11InputLayout* inputLayout; // And a define layout
 
 	ID3D10Blob *VS, *PS;

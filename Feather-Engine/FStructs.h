@@ -17,7 +17,7 @@ struct FColour
 struct FVertex
 {
 	float X,Y,Z;
-	FColour Colour;	
+	FColour Colour;
 };
 
 #endif
